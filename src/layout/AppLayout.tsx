@@ -3,6 +3,8 @@ import React from 'react'
 import { NavLink, Outlet } from 'react-router'
 import HomeIcon from '@mui/icons-material/Home'
 import SearchIcon from '@mui/icons-material/Search';
+import LibraryHead from '../components/LibraryHead/LibraryHead';
+import Library from '../components/Library/Library';
 
 const Layout = styled("div")({
     display:'flex',
@@ -44,7 +46,11 @@ const StyledNavLink = styled(NavLink)(({theme}) => ({
     color: theme.palette.text.secondary,
     "&:hover":{
         color:theme.palette.text.primary,
-    }
+    },
+    "&.active": {
+        color: theme.palette.primary.main,
+        fontWeight: 700,
+    },
 }));
 const AppLayout = () => {
     return (
@@ -52,7 +58,7 @@ const AppLayout = () => {
             <Sidebar>
                 <ContentBox>
                     <NavList>
-                        <StyledNavLink to={'/'}>
+                        <StyledNavLink to={'/'} end>
                             <HomeIcon/>
                             <Typography variant="h2" fontWeight={700}>Home</Typography>
                         </StyledNavLink>
@@ -61,6 +67,10 @@ const AppLayout = () => {
                             <Typography variant='h2' fontWeight={700}>Search</Typography>
                         </StyledNavLink>
                     </NavList>
+                </ContentBox>
+                <ContentBox>
+                    <LibraryHead />
+                    <Library/>
                 </ContentBox>
             </Sidebar>
             <Outlet />
