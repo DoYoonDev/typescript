@@ -2,7 +2,7 @@ import React, { Suspense } from 'react';
 import logo from './logo.svg';
 import './App.css';
 import { Route, Routes } from 'react-router';
-import LoadingSpinner from './pages/common/components/LoadingSpinner';
+import LoadingSpinner from './common/components/LoadingSpinner';
 
 const AppLayout = React.lazy(() => import('./layout/AppLayout'));
 const HomePage = React.lazy(() => import('./pages/HomePage/HomePage'));

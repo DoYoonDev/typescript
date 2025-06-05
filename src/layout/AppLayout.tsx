@@ -1,10 +1,11 @@
-import { Box, colors, styled, Typography } from '@mui/material'
+import { Box, colors, styled, Typography,  } from '@mui/material'
 import React from 'react'
-import { NavLink, Outlet } from 'react-router'
+import { NavLink, Outlet,  } from 'react-router'
 import HomeIcon from '@mui/icons-material/Home'
 import SearchIcon from '@mui/icons-material/Search';
 import LibraryHead from '../components/LibraryHead/LibraryHead';
 import Library from '../components/Library/Library';
+import Navbar from '../components/Navbar';
 
 const Layout = styled("div")({
     display:'flex',
@@ -73,7 +74,10 @@ const AppLayout = () => {
                     <Library/>
                 </ContentBox>
             </Sidebar>
-            <Outlet />
+            <ContentBox>
+                <Navbar />
+                <Outlet />
+            </ContentBox>
         </Layout>
     )
 }

@@ -1,9 +1,10 @@
 import React from 'react'
+import NewReleases from './components/NewReleases'
 
 const HomePage = () => {
   return (
     <div>
-      홈페이지
+      <NewReleases />
     </div>
   )
 }
