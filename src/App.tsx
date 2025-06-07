@@ -1,8 +1,9 @@
-import React, { Suspense } from 'react';
+import React, { Suspense, useEffect } from 'react';
 import logo from './logo.svg';
 import './App.css';
 import { Route, Routes } from 'react-router';
 import LoadingSpinner from './common/components/LoadingSpinner';
+import useExchangeToken from './hooks/useExchangeToken';
 
 const AppLayout = React.lazy(() => import('./layout/AppLayout'));
 const HomePage = React.lazy(() => import('./pages/HomePage/HomePage'));
@@ -18,6 +19,18 @@ const PlaylistPage = React.lazy(() => import('./pages/PlaylistPage/PlaylistPage'
 // 4. 플레이리스트 상세 페이지 - /playlist/:id
 // 5. (모바일버전) 플레이리스트 보여주는 페이지 - /playlist
 function App() {
+  const urlParams = new URLSearchParams(window.location.search);
+  let code = urlParams.get('code');
+  const codeVerifier = localStorage.getItem('code_verifier');
+  
+  const {mutate: exchangeToken} = useExchangeToken();
+
+  useEffect(() => {
+    if(code && codeVerifier) {
+      exchangeToken({code, codeVerifier});
+    }
+  },[code, codeVerifier, exchangeToken]);
+
   return (
     <Suspense fallback={<LoadingSpinner />}>
       <Routes>
@@ -26,7 +39,7 @@ function App() {
           <Route path='search' element={<SearchPage />} />
           <Route path='search/:keyword' element={<SearchWithKeywordPage />} />
           <Route path='playlist/:id' element={<PlaylistDetailPage />} />
-          <Route path='playlist' element={<PlaylistPage/>} />
+          <Route path='playlist' element={<PlaylistPage />} />
         </Route>
       </Routes>
     </Suspense>
