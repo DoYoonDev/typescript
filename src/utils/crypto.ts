@@ -10,9 +10,14 @@ export const sha256 = async (plain:string):Promise<ArrayBuffer> => {
   return window.crypto.subtle.digest('SHA-256', data)
 }
 
-export const base64encode = (input:ArrayBuffer):string => {
-  return btoa(String.fromCharCode(...new Uint8Array(input)))
-    .replace(/=/g, '')
+export const base64encode = (input: ArrayBuffer): string => {
+  const bytes = new Uint8Array(input);
+  let binary = '';
+  for (let i = 0; i < bytes.byteLength; i++) {
+    binary += String.fromCharCode(bytes[i]);
+  }
+  return btoa(binary)
     .replace(/\+/g, '-')
-    .replace(/\//g, '_');
-}
+    .replace(/\//g, '_')
+    .replace(/=+$/, '');
+};

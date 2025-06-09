@@ -7,7 +7,6 @@ import Card from '../../../common/components/Card';
 
 const NewReleases = () => {
   const { data, error, isLoading } = useGetNewReleases();
-  console.log("NewReleases.tsx - 받아온 데이타 : ", data);
 
   if (error) {
     return <ErrorMessage errorMessage={error.message} />;

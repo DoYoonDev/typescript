@@ -28,6 +28,7 @@ function App() {
   useEffect(() => {
     if(code && codeVerifier) {
       exchangeToken({code, codeVerifier});
+      window.history.replaceState(null, "", "/");
     }
   },[code, codeVerifier, exchangeToken]);
 
