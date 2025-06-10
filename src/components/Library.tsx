@@ -18,8 +18,17 @@ const PlaylistContainer = styled("div")(({ theme }) => ({
     maxHeight: "calc(100vh - 65px - 119px)",
   },
 }));
-const token = localStorage.getItem("access_token");
+
+
 const Library = () => {
+  const [token, setToken] = React.useState<string | null>(null);
+
+  useEffect(() => {
+    const localToken = localStorage.getItem("access_token");
+    setToken(localToken);
+  }, []);
+
+
   const {
     data,
     isLoading,
@@ -31,6 +40,10 @@ const Library = () => {
     return <LoadingSpinner />;
   }
   if (error) {
+    // 401 에러인 경우 로그인 안 된 것으로 간주
+    if ((error as any).response?.status === 401) {
+      return <EmptyPlaylist />;
+    }
     return <ErrorMessage errorMessage={error.message} />;
   }
 

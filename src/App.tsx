@@ -22,15 +22,24 @@ function App() {
   const urlParams = new URLSearchParams(window.location.search);
   let code = urlParams.get('code');
   const codeVerifier = localStorage.getItem('code_verifier');
-  
-  const {mutate: exchangeToken} = useExchangeToken();
+
+  const { mutate: exchangeToken } = useExchangeToken();
+
+  const token = localStorage.getItem("access_token");
+  const needsTokenExchange = code && codeVerifier && !token;
 
   useEffect(() => {
-    if(code && codeVerifier) {
-      exchangeToken({code, codeVerifier});
-      window.history.replaceState(null, "", "/");
-    }
-  },[code, codeVerifier, exchangeToken]);
+  if (needsTokenExchange) {
+    exchangeToken({ code, codeVerifier }, {
+      onSuccess: () => {
+        window.location.replace("/");
+      },
+      onError: (err) => {
+        console.error("❌ Token exchange 실패:", err);
+      }
+    });
+  }
+}, [needsTokenExchange, code, codeVerifier, exchangeToken]);
 
   return (
     <Suspense fallback={<LoadingSpinner />}>

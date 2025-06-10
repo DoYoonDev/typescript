@@ -30,7 +30,8 @@ export const getClientCredentialToken = async (): Promise<ClientCredentialTokenR
     }
 }
 
-export const exchangeToken = async (code: string, codeVerifier: string):Promise<ExchangeTokenResponse> => {
+export const exchangeToken = async (code: string, codeVerifier: string): Promise<ExchangeTokenResponse> => {
+    console.log("🟡 exchangeToken called with:", code, codeVerifier); // 추가
     try {
         const url = "https://accounts.spotify.com/api/token";
         if (!CLIENT_ID || !REDIRECT_URI) {
@@ -45,13 +46,14 @@ export const exchangeToken = async (code: string, codeVerifier: string):Promise<
         });
 
         const response = await axios.post(url, body, {
-            headers:{
+            headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
             },
         });
 
         return response.data
-    } catch (error) {
+    } catch (error: any) {
+        console.error("❌ Token exchange failed:", error.response?.data || error.message);
         throw new Error("Fail to fetch token");
     }
 }

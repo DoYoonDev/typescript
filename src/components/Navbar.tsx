@@ -33,7 +33,7 @@ const ProfileMenuItem = styled(MenuItem)({
 });
 
 const Navbar = () => {
-    const { data: userProfile } = useGetCurrentUserProfile();
+    const { data: userProfile, error } = useGetCurrentUserProfile();
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const queryClient = useQueryClient();
 
@@ -49,6 +49,7 @@ const Navbar = () => {
         localStorage.removeItem('access_token');
         queryClient.removeQueries({ queryKey: ['current-user-profile'], exact: true });
         handleMenuClose();
+        window.location.replace("/");
     };
     return (
         <Box display="flex" justifyContent="flex-end" alignItems="center" height="64px">
