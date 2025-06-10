@@ -29,17 +29,17 @@ function App() {
   const needsTokenExchange = code && codeVerifier && !token;
 
   useEffect(() => {
-  if (needsTokenExchange) {
-    exchangeToken({ code, codeVerifier }, {
-      onSuccess: () => {
-        window.location.replace("/");
-      },
-      onError: (err) => {
-        console.error("❌ Token exchange 실패:", err);
-      }
-    });
-  }
-}, [needsTokenExchange, code, codeVerifier, exchangeToken]);
+    if (needsTokenExchange) {
+      exchangeToken({ code, codeVerifier }, {
+        onSuccess: () => {
+          window.location.replace("/");
+        },
+        onError: (err) => {
+          console.error("❌ Token exchange 실패:", err);
+        }
+      });
+    }
+  }, [needsTokenExchange, code, codeVerifier, exchangeToken]);
 
   return (
     <Suspense fallback={<LoadingSpinner />}>

@@ -49,7 +49,6 @@ const Navbar = () => {
         localStorage.removeItem('access_token');
         queryClient.removeQueries({ queryKey: ['current-user-profile'], exact: true });
         handleMenuClose();
-        window.location.replace("/");
     };
     return (
         <Box display="flex" justifyContent="flex-end" alignItems="center" height="64px">
