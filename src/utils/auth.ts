@@ -11,7 +11,7 @@ export const getSpotifyAuthUrl = async () => {
     const redirectUri = REDIRECT_URI;
     const scope = SCOPE;
     const authUrl = new URL("https://accounts.spotify.com/authorize")
-
+    console.log("리다이랙트 URL : ", redirectUri);
     // generated in the previous step
     window.localStorage.setItem('code_verifier', codeVerifier);
 
