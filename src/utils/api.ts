@@ -10,10 +10,16 @@ const api = axios.create({
 
 api.interceptors.request.use((request) => {
   const token = localStorage.getItem("access_token");
+
+  if (request.url?.includes("/token")) {
+    return request;
+  }
+  
   if (token) {
     request.headers.Authorization = `Bearer ${token}`;
   } else {
     console.warn("No access token found");
+    return Promise.reject(new Error("No access token"));
   }
   return request;
 });

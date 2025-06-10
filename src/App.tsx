@@ -1,5 +1,4 @@
 import React, { Suspense, useEffect } from 'react';
-import logo from './logo.svg';
 import './App.css';
 import { Route, Routes } from 'react-router';
 import LoadingSpinner from './common/components/LoadingSpinner';
@@ -12,23 +11,24 @@ const SearchWithKeywordPage = React.lazy(() => import('./pages/SearchWithKeyword
 const PlaylistDetailPage = React.lazy(() => import('./pages/PlaylistDetailPage/PlaylistDetailPage'));
 const PlaylistPage = React.lazy(() => import('./pages/PlaylistPage/PlaylistPage'));
 
-// 0. 사이드바 있어야함 (플레이리스트, 메뉴)
-// 1. 홈페이지 - /
-// 2. 검색페이지 - /search
-// 3. 검색 결과 페이지 - /search/:keyword
-// 4. 플레이리스트 상세 페이지 - /playlist/:id
-// 5. (모바일버전) 플레이리스트 보여주는 페이지 - /playlist
 function App() {
   const urlParams = new URLSearchParams(window.location.search);
-  let code = urlParams.get('code');
+  const code = urlParams.get('code');
   const codeVerifier = localStorage.getItem('code_verifier');
+  const token = localStorage.getItem('access_token');
 
   const { mutate: exchangeToken } = useExchangeToken();
 
-  const token = localStorage.getItem("access_token");
   const needsTokenExchange = code && codeVerifier && !token;
 
   useEffect(() => {
+    // 로그인 안 된 상태 → access_token 정리
+    if (!token) {
+      console.warn("⛔ access_token 없음 → 로그인 필요");
+      localStorage.removeItem("access_token");
+    }
+
+    // 로그인 코드가 있는 경우 → 토큰 교환
     if (needsTokenExchange) {
       exchangeToken({ code, codeVerifier }, {
         onSuccess: () => {
@@ -39,7 +39,7 @@ function App() {
         }
       });
     }
-  }, [needsTokenExchange, code, codeVerifier, exchangeToken]);
+  }, [needsTokenExchange, code, codeVerifier, exchangeToken, token]);
 
   return (
     <Suspense fallback={<LoadingSpinner />}>
