@@ -3,5 +3,11 @@ body {
   margin: 0;
   padding: 0;
   overflow-x: hidden;
+  -ms-overflow-style: none; /* IE, Edge */
+  scrollbar-width: none; /* Firefox */
   height: 100%;
+}
+
+body::-webkit-scrollbar {
+  display: none; /* Chrome, Safari */
 }

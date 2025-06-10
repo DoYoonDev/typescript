@@ -8,13 +8,14 @@ import EmptyPlaylist from "./EmptyPlaylist";
 import useGetCurrentUserProfile from "../hooks/useGetCurrentUserProfile";
 import { useInView } from "react-intersection-observer";
 const PlaylistContainer = styled("div")(({ theme }) => ({
-  overflowY: "auto",
+  overflowY: "scroll", // 세로 스크롤 허용
   maxHeight: "calc(100vh - 240px)",
   height: "100%",
+  WebkitOverflowScrolling: "touch", // iOS에서 부드러운 스크롤
+  scrollbarWidth: "none",           // Firefox
+  msOverflowStyle: "none",          // IE, Edge
   "&::-webkit-scrollbar": {
-    display: "none",
-    msOverflowStyle: "none", // IE and Edge
-    scrollbarWidth: "none", // Firefox
+    display: "none",                // Chrome, Safari
   },
   [theme.breakpoints.down("sm")]: {
     maxHeight: "calc(100vh - 65px - 119px)",
