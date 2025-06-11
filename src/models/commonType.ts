@@ -1,3 +1,6 @@
+import { SimplifiedAlbum } from "./album";
+import { Artist } from "./artist";
+
 export interface ExternalUrls {
     spotify: string
 }
@@ -38,26 +41,6 @@ export interface ExternalIds {
 export interface ResumePoint {
     fully_played?: boolean;
     resume_position_ms?: number;
-}
-
-export interface Show {
-    available_markets: string[];
-    copyrights: Copyrights[];
-    description: string;
-    html_description: string;
-    explicit: boolean;
-    external_urls: ExternalUrls;
-    href: string;
-    id: string;
-    images: Image[];
-    is_externally_hosted: boolean;
-    languages: string[];
-    media_type: string;
-    name: string;
-    publisher: string;
-    type: string;
-    uri: string;
-    total_episodes: number;
 }
 
 export interface Copyrights {

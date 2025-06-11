@@ -1,7 +1,8 @@
 import { SimplifiedAlbum } from "./album";
 import { ApiResponse } from "./apiResponse";
 import { Artist } from "./artist";
-import { ExternalIds, ExternalUrls, Followers, Image, Owner, Restriction, ResumePoint, Show } from "./commonType";
+import { ExternalUrls, Followers, Image, Owner } from "./commonType";
+import { EpisodeObject, TrackObject } from "./track";
 
 export interface GetCurrentUserPlaylistRequest {
     limit?: number,
@@ -48,7 +49,7 @@ export interface PlaylistTrack {
         uri?: string;
     } | null;
     is_local?: boolean;
-    track: Track | EpisodeObject;
+    track: TrackObject | EpisodeObject;
 }
 
 export interface GetPlaylistRequest {
@@ -58,48 +59,10 @@ export interface GetPlaylistRequest {
     additional_types?: string;
 }
 
-export interface Track {
-    album?: SimplifiedAlbum;
-    artists?: Artist;
-    available_markets?: string[];
-    disc_number?: number;
-    duration_ms?: number;
-    explicit?: boolean;
-    external_idx?: ExternalIds;
-    external_urls?: ExternalUrls;
-    href?: string;
-    id?: string;
-    is_playable?: boolean;
-    linked_from?: {}
-    restrictions?: Restriction;
-    name?: string;
-    popularity?: number;
-    preview_url?: string | null;
-    track_number?: number;
-    uri?: string;
-    is_local?: boolean;
+export interface GetPlaylistItemsRequest extends GetPlaylistRequest {
+    offset?: number;
+    limit?: number;
 }
 
-export interface EpisodeObject {
-    audio_preview_url: string | null;
-    description: string;
-    html_description: string;
-    duration_ms: number;
-    explicit: boolean;
-    external_urls: ExternalUrls;
-    href: string;
-    id: string;
-    images: Image[];
-    is_externally_hosted: boolean;
-    is_playable: boolean;
-    language: string;
-    languages: string[];
-    name: string;
-    release_date: string;
-    release_date_precision: string;
-    resume_point?: ResumePoint;
-    type: string;
-    uri: string;
-    restrictions?: Restriction;
-    show: Show;
-}
+export type GetPlaylistItemsResponse = ApiResponse<PlaylistTrack>
+
