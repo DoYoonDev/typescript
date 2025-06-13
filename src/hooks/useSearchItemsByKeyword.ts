@@ -3,7 +3,7 @@ import { searchItemsByKeyword } from "../apis/searchApi";
 import { SearchRequestParams } from "../models/search";
 import useClientCredentialToken from "./useClientCredentialToken";
 
-const useSearchItemsByKeyword = (params:SearchRequestParams) => {
+const useSearchItemsByKeyword = (params: SearchRequestParams) => {
     const clientCredentialToken = useClientCredentialToken();
     return useInfiniteQuery({
         queryKey: ["search", params],
@@ -11,11 +11,30 @@ const useSearchItemsByKeyword = (params:SearchRequestParams) => {
             if (!clientCredentialToken) {
                 throw new Error("No token available");
             }
-            return searchItemsByKeyword(clientCredentialToken, parmas);
+            return searchItemsByKeyword(clientCredentialToken, { 
+                ...params, 
+                offset: pageParam 
+            });
         },
         initialPageParam: 0,
         getNextPageParam: (lastPage) => {
+            const nextPageUrl =
+                lastPage.tracks?.next ||
+                lastPage.artists?.next ||
+                lastPage.albums?.next ||
+                lastPage.playlists?.next ||
+                lastPage.shows?.next ||
+                lastPage.episodes?.next ||
+                lastPage.audiobook?.next;
 
-        }
+            if (nextPageUrl) {
+                const nextOffset = new URL(nextPageUrl).searchParams.get("offset");
+                return nextOffset ? parseInt(nextOffset) : undefined;
+            }
+            return undefined;
+        },
+        enabled: !!params.q,
     })
 }
+
+export default useSearchItemsByKeyword;

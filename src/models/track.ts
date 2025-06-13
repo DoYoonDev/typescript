@@ -4,7 +4,7 @@ import { ExternalIds, ExternalUrls, Restriction, Image, ResumePoint, Copyrights 
 
 export interface TrackObject {
     album?: SimplifiedAlbum;
-    artists?: Artist;
+    artists: Artist[];
     available_markets?: string[];
     disc_number?: number;
     duration_ms?: number;
@@ -12,7 +12,7 @@ export interface TrackObject {
     external_idx?: ExternalIds;
     external_urls?: ExternalUrls;
     href?: string;
-    id?: string;
+    id: string;
     is_playable?: boolean;
     linked_from?: TrackObject;
     restrictions?: Restriction;
