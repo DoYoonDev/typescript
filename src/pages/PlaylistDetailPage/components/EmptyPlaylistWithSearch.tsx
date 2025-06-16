@@ -1,18 +1,19 @@
-import { Box, InputAdornment, styled, TextField, Typography } from "@mui/material";
+import { Box, InputAdornment, styled, TableContainer, TextField, Typography } from "@mui/material";
 import React, { useState } from "react";
-import useSearchItemsByKeyword from "../../../hooks/useSearchItemsByKeyword";
 import { SEARCH_TYPE } from "../../../models/search";
 import SearchResultList from "./SearchResultList";
 import LoadingSpinner from "../../../common/components/LoadingSpinner";
 import SearchIcon from "@mui/icons-material/Search";
 import { TrackObject } from "../../../models/track";
+import { useQueryClient } from "@tanstack/react-query";
+import { useParams } from "react-router";
+import useSearchItemsByKeyword from "../../../hooks/useSearchItemsByKeyword";
 
-const SearchContainer = styled(Box)({ // 스크롤 디자인 
+const SearchContainer = styled(Box)({
     padding: "16px",
     width: "100%",
     height: "100%",
     overflowY: "auto",
-
     "&::-webkit-scrollbar": {
         display: "none",
     },
@@ -22,30 +23,44 @@ const SearchContainer = styled(Box)({ // 스크롤 디자인
 
 const StyledTextField = styled(TextField)(({ theme }) => ({
     width: "100%",
-
     "& .MuiInputBase-root": {
-        borderRadius: "4px", // 입력 필드의 둥근 모서리
-        backgroundColor: theme.palette.action.active, // 입력 필드의 배경 색상
-        color: "white", // 텍스트 색상
+        borderRadius: "4px",
+        backgroundColor: theme.palette.action.active,
+        color: "white",
     },
     "& .MuiOutlinedInput-root": {
         "& fieldset": {
-            borderColor: "transparent", // 테두리 색상 제거
+            borderColor: "transparent",
         },
         "&:hover fieldset": {
-            borderColor: "gray", // 마우스 호버 시 테두리 색상
+            borderColor: "gray",
         },
         "&.Mui-focused fieldset": {
-            borderColor: "gray", // 포커스 시 테두리 색상
+            borderColor: "gray",
         },
     },
 }));
 
-
+const StyledTableContainer = styled(TableContainer)(({ theme }) => ({
+  display: "block", // ✅ 여기서 설정
+  background: theme.palette.background.paper,
+  color: theme.palette.common.white,
+  height: "calc(100% - 64px)",
+  borderRadius: "8px",
+  overflowY: "auto",
+  "&::-webkit-scrollbar": {
+    display: "none",
+  },
+  msOverflowStyle: "none",
+  scrollbarWidth: "none",
+}));
 
 const EmptyPlaylistWithSearch = () => {
     const [keyword, setKeyword] = useState<string>("");
-    // 무한스크롤을 위해 nextpage 관련 추가 
+    const { id: playlistId } = useParams<{ id: string }>();
+    const [isAdded, setIsAdded] = useState(false);
+    const queryClient = useQueryClient();
+
     const {
         data,
         error,
@@ -55,18 +70,23 @@ const EmptyPlaylistWithSearch = () => {
         fetchNextPage,
     } = useSearchItemsByKeyword({
         q: keyword,
-        type: [SEARCH_TYPE.Tarck],
+        type: [SEARCH_TYPE.Track],
     });
-    console.log("ddd", data);
-    // 모든 페이지를 가져오기 위해 flatMap으로 바꿈 
-    const tracks = (data?.pages.flatMap((page) => page.tracks?.items) ?? []) as TrackObject;
+
+    if (!playlistId) return null;
+    if (isAdded) return null;
+
+
+    const tracks =
+        (data?.pages.flatMap((page) => page.tracks?.items) ?? []) as TrackObject[];
     const hasResults = tracks.length > 0;
+
     const handleSearchKeyword = (event: React.ChangeEvent<HTMLInputElement>) => {
         setKeyword(event.target.value);
     };
 
     return (
-        <Box display="inline-block">
+        <SearchContainer>
             <Typography variant="h1" my="10px">
                 Let's find something for your playlist
             </Typography>
@@ -89,35 +109,39 @@ const EmptyPlaylistWithSearch = () => {
                 onChange={handleSearchKeyword}
             />
 
-            {/* 로딩 중이면 스피너 */}
             {isLoading && <LoadingSpinner />}
 
-            {/* 에러 발생 시 메시지 */}
             {error && (
                 <Typography color="error" mt={2}>
                     검색 중 문제가 발생했습니다.
                 </Typography>
             )}
 
-            {/* 검색 결과 없음 메시지 */}
             {!isLoading && keyword && !hasResults && (
                 <Typography mt={2}>검색 결과가 없습니다.</Typography>
             )}
 
-            {/* 검색 결과 표시 */}
             {hasResults && (
                 <SearchResultList
                     list={tracks}
                     hasNextPage={hasNextPage}
                     isFetchingNextPage={isFetchingNextPage}
                     fetchNextPage={fetchNextPage}
+                    playlistId={playlistId}
+                    onTrackAdded={() => {
+                        setIsAdded(true);
+                        queryClient.invalidateQueries({
+                            queryKey: [
+                                "playlist-items",
+                                { playlist_id: playlistId, limit: 20, offset: 0 },
+                            ],
+                        });
+                        window.location.reload();
+                    }}
                 />
             )}
-        </Box>
+        </SearchContainer>
     );
 };
 
 export default EmptyPlaylistWithSearch;
-
-
-

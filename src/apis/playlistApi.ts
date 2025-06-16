@@ -49,3 +49,16 @@ export const createPlaylist = async (user_id: string, params: CreatePlaylistRequ
         throw new Error("Fail to create playlist");
     }
 }
+
+export const addTracksToPlaylist = async (
+  playlist_id: string,
+  uris: string[]
+): Promise<void> => {
+  try {
+    await api.post(`/playlists/${playlist_id}/tracks`, {
+      uris,
+    });
+  } catch (error) {
+    throw new Error("Fail to add tracks to playlist");
+  }
+};

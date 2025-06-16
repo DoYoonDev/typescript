@@ -4,19 +4,20 @@ import {
   Box,
   Button,
   styled,
-  TableBody,
+  TableBody, // ✅ 추가
   TableCell,
-  TableContainer,
   TableRow,
   Typography,
 } from "@mui/material";
 import { useEffect } from "react";
 import LoadingSpinner from "../../../common/components/LoadingSpinner";
-const StyledTableContainer = styled(TableContainer)(({ theme }) => ({
-  background: theme.palette.background.paper,
-  color: theme.palette.common.white,
-  width: "100%",
-}));
+import { addTracksToPlaylist } from "../../../apis/playlistApi";
+
+const AlbumImage = styled("img")({
+  borderRadius: "4px",
+  marginRight: "12px",
+});
+
 const StyledTableRow = styled(TableRow)(({ theme }) => ({
   width: "100%",
   "&:hover": {
@@ -26,61 +27,76 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
     borderBottom: "none",
   },
 }));
-const AlbumImage = styled("img")({
-  borderRadius: "4px",
-  marginRight: "12px",
-});
-interface SearchResultListProps { // props 추가 
+
+interface SearchResultListProps {
   list: TrackObject[];
   hasNextPage: boolean;
   isFetchingNextPage: boolean;
   fetchNextPage: () => void;
+  playlistId: string;
+  onTrackAdded: () => void;
 }
+
 const SearchResultList = ({
   list,
   hasNextPage,
   isFetchingNextPage,
   fetchNextPage,
+  playlistId,
+  onTrackAdded,
 }: SearchResultListProps) => {
-  const [ref, inView] = useInView(); // 무한스크롤 옵저버 추가 
+  const [ref, inView] = useInView();
 
-  useEffect(() => { // fetchNextPage 호출 추가 
+  useEffect(() => {
     if (inView && hasNextPage && !isFetchingNextPage) {
       fetchNextPage();
     }
   }, [inView, hasNextPage, isFetchingNextPage]);
 
   return (
-    <StyledTableContainer>
-      <TableBody sx={{ width: "100%" }}>
-        {list.map((track) => (
-          <StyledTableRow key={track.id}>
-            <TableCell>
-              <Box display="flex" alignItems="center">
-                <Box>
-                  <AlbumImage src={track.album?.images[0].url} width="40px" />
-                </Box>
-                <Box>
-                  <Typography fontWeight={700}>{track.name}</Typography>
-                  <Typography color="text.secondary">
-                    {track.artists ? track.artists[0].name : "Unknown Artist"}
-                  </Typography>
-                </Box>
+    <TableBody> {/* ✅ <div> 대신 <TableBody>로 변경하여 <tr>를 포함할 수 있도록 함 */}
+      {list.map((track) => (
+        <StyledTableRow key={track.id}>
+          <TableCell>
+            <Box display="flex" alignItems="center">
+              <Box>
+                <AlbumImage src={track.album?.images[0].url} width="40px" />
               </Box>
-            </TableCell>
-            <TableCell>{track.album?.name}</TableCell>
-            <TableCell>
-              <Button>Add</Button>
-            </TableCell>
-          </StyledTableRow>
-        ))}
-        <div ref={ref} style={{ height: 1 }}> // 무한스크롤 영역 추가 
+              <Box>
+                <Typography fontWeight={700}>{track.name}</Typography>
+                <Typography color="text.secondary">
+                  {track.artists ? track.artists[0].name : "Unknown Artist"}
+                </Typography>
+              </Box>
+            </Box>
+          </TableCell>
+          <TableCell>{track.album?.name}</TableCell>
+          <TableCell>
+            <Button
+              onClick={async () => {
+                try {
+                  const uri = `spotify:track:${track.id}`;
+                  await addTracksToPlaylist(playlistId, [uri]);
+                  onTrackAdded();
+                } catch (err) {
+                  console.error("Track 추가 실패", err);
+                }
+              }}
+            >
+              Add
+            </Button>
+          </TableCell>
+        </StyledTableRow>
+      ))}
+
+      <TableRow> {/* ✅ 무한스크롤 로딩 바인딩도 TableRow 내부에 포함 */}
+        <TableCell colSpan={3}>
+          <div ref={ref} style={{ height: 1 }} />
           {isFetchingNextPage && <LoadingSpinner />}
-        </div>
-      </TableBody>
-    </StyledTableContainer>
+        </TableCell>
+      </TableRow>
+    </TableBody>
   );
 };
 
 export default SearchResultList;
-
