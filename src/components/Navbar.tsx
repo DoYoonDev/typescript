@@ -11,6 +11,8 @@ import React, { useState } from 'react'
 import LoginButton from '../common/components/LoginButton'
 import useGetCurrentUserProfile from '../hooks/useGetCurrentUserProfile'
 import { useQueryClient } from '@tanstack/react-query';
+import { useLocation } from 'react-router';
+import SearchInput from '../common/components/SearchInput';
 
 const ProfileContainer = styled("div")({
     display: "flex",
@@ -35,7 +37,10 @@ const ProfileMenuItem = styled(MenuItem)({
 const Navbar = () => {
     const { data: userProfile, error } = useGetCurrentUserProfile();
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+    const location = useLocation();
+    const isSearchPage = location.pathname.startsWith("/search");
     const queryClient = useQueryClient();
+    const [keyword, setKeyword] = useState<string>("");
 
     const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
         setAnchorEl(event.currentTarget);
@@ -51,7 +56,19 @@ const Navbar = () => {
         handleMenuClose();
     };
     return (
-        <Box display="flex" justifyContent="flex-end" alignItems="center" height="64px">
+        <Box
+            sx={{ 
+                display: "flex",
+                justifyContent: isSearchPage ? "space-between" : "flex-end", 
+                alignItems: "center",
+                height: "64px", 
+            }}
+        >
+            {isSearchPage && (
+                <Box width="450px">
+                    <SearchInput keyword={keyword} onChange={setKeyword} />
+                </Box>
+            )}
             {userProfile ? (
                 <ProfileContainer>
                     <IconButton onClick={handleMenuOpen} size="small">
