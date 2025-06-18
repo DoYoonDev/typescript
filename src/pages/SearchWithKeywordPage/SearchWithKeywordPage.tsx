@@ -1,5 +1,4 @@
 import React from "react";
-
 import useSearchItemsByKeyword from "../../hooks/useSearchItemsByKeyword";
 import {
   Box,
@@ -10,12 +9,11 @@ import {
   useMediaQuery,
 } from "@mui/material";
 import { SEARCH_TYPE } from "../../models/search";
-import { useParams } from "react-router";
-import LoadingSpinner from "../../common/components/LoadingSpinner";
 import AlbumCard from "../../common/components/AlbumCard";
 import TrackListItem from "../../common/components/TrackListItem";
 import ArtistCard from "../../common/components/ArtistCard";
-
+import { useParams } from "react-router";
+import LoadingSpinner from "../../common/components/LoadingSpinner";
 
 const SearchResultContainer = styled(Box)({
   display: "flex",

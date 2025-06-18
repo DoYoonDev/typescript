@@ -1,101 +1,101 @@
-import { useInView } from "react-intersection-observer";
+import React from "react";
+import { Avatar, Box, Button, List, ListItem, Typography } from "@mui/material";
+import AddIcon from "@mui/icons-material/Add";
+import useAddTrackToPlaylist from "../../../hooks/useAddTrackToPlaylist";
+import { useParams } from "react-router";
 import { TrackObject } from "../../../models/track";
-import {
-  Box,
-  Button,
-  styled,
-  TableBody, // ✅ 추가
-  TableCell,
-  TableRow,
-  Typography,
-} from "@mui/material";
-import { useEffect } from "react";
-import LoadingSpinner from "../../../common/components/LoadingSpinner";
-import { addTracksToPlaylist } from "../../../apis/playlistApi";
-
-const AlbumImage = styled("img")({
-  borderRadius: "4px",
-  marginRight: "12px",
-});
-
-const StyledTableRow = styled(TableRow)(({ theme }) => ({
-  width: "100%",
-  "&:hover": {
-    backgroundColor: theme.palette.action.hover,
-  },
-  "& .MuiTableCell-root": {
-    borderBottom: "none",
-  },
-}));
 
 interface SearchResultListProps {
   list: TrackObject[];
-  hasNextPage: boolean;
-  isFetchingNextPage: boolean;
-  fetchNextPage: () => void;
-  playlistId: string;
-  onTrackAdded: () => void;
 }
 
-const SearchResultList = ({
-  list,
-  hasNextPage,
-  isFetchingNextPage,
-  fetchNextPage,
-  playlistId,
-  onTrackAdded,
-}: SearchResultListProps) => {
-  const [ref, inView] = useInView();
+const SearchResultList = ({ list }: SearchResultListProps) => {
+  const { id: playlist_id } = useParams<{ id: string }>();
 
-  useEffect(() => {
-    if (inView && hasNextPage && !isFetchingNextPage) {
-      fetchNextPage();
+  const { mutate: addTrack } = useAddTrackToPlaylist();
+
+  const handleAddClick = (track: TrackObject) => {
+    if (!track.uri) {
+      console.warn("❌ 트랙에 uri 없음:", track);
+      return;
     }
-  }, [inView, hasNextPage, isFetchingNextPage]);
-
+    addTrack({
+      playlist_id: playlist_id!,
+      uris: [track.uri],
+    });
+  };
   return (
-    <TableBody> {/* ✅ <div> 대신 <TableBody>로 변경하여 <tr>를 포함할 수 있도록 함 */}
+    <List sx={{ maxWidth: "100%", width: "100%" }}>
       {list.map((track) => (
-        <StyledTableRow key={track.id}>
-          <TableCell>
-            <Box display="flex" alignItems="center">
-              <Box>
-                <AlbumImage src={track.album?.images[0].url} width="40px" />
-              </Box>
-              <Box>
-                <Typography fontWeight={700}>{track.name}</Typography>
-                <Typography color="text.secondary">
-                  {track.artists ? track.artists[0].name : "Unknown Artist"}
-                </Typography>
-              </Box>
-            </Box>
-          </TableCell>
-          <TableCell>{track.album?.name}</TableCell>
-          <TableCell>
+        <ListItem
+          key={track.id}
+          sx={{
+            maxWidth: "100%",
+            width: "100%",
+            py: 1,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "flex-start",
+            gap: 2,
+            borderRadius: 1,
+            transition: "background-color 0.2s ease",
+            "&:hover": {
+              backgroundColor: "#2a2a2a",
+            },
+          }}
+        >
+          <Box display="flex" gap={2}>
             <Button
-              onClick={async () => {
-                try {
-                  const uri = `spotify:track:${track.id}`;
-                  await addTracksToPlaylist(playlistId, [uri]);
-                  onTrackAdded();
-                } catch (err) {
-                  console.error("Track 추가 실패", err);
-                }
+              variant="text"
+              sx={{
+                color: "#1ED760",
+                fontWeight: 500,
+                minWidth: "50px",
               }}
+              onClick={() => handleAddClick(track)}
             >
-              Add
+              <AddIcon />
             </Button>
-          </TableCell>
-        </StyledTableRow>
-      ))}
 
-      <TableRow> {/* ✅ 무한스크롤 로딩 바인딩도 TableRow 내부에 포함 */}
-        <TableCell colSpan={3}>
-          <div ref={ref} style={{ height: 1 }} />
-          {isFetchingNextPage && <LoadingSpinner />}
-        </TableCell>
-      </TableRow>
-    </TableBody>
+            <Avatar
+              variant="square"
+              src={track.album?.images?.[0]?.url}
+              alt={track.name}
+              sx={{ width: 48, height: 48, borderRadius: "8px" }}
+            />
+          </Box>
+
+          <Box display="flex" width="100%" gap={2}>
+            <Box sx={{ flex: 1, minWidth: 0 }}>
+              <Typography variant="body2" color="text.secondary" noWrap>
+                제목
+              </Typography>
+              <Typography fontWeight={600} noWrap>
+                {track.name}
+              </Typography>
+            </Box>
+
+            <Box sx={{ flex: 1, minWidth: 0 }}>
+              <Typography variant="body2" color="text.secondary" noWrap>
+                아티스트
+              </Typography>
+              <Typography fontWeight={600} noWrap>
+                {track.artists?.map((artist) => artist.name).join(", ")}
+              </Typography>
+            </Box>
+
+            <Box sx={{ flex: 1, minWidth: 0 }}>
+              <Typography variant="body2" color="text.secondary" noWrap>
+                앨범
+              </Typography>
+              <Typography fontWeight={600} noWrap>
+                {track.album?.name}
+              </Typography>
+            </Box>
+          </Box>
+        </ListItem>
+      ))}
+    </List>
   );
 };
 
