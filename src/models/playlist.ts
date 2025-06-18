@@ -72,3 +72,13 @@ export interface CreatePlaylistRequest {
     collaborative?: boolean;
     description?: string;
 }
+
+export interface AddTrackToPlaylistRequest {
+  playlist_id: string;
+  position?: number;
+  uris?: string[];
+}
+
+export interface AddTrackToPlaylistResponse {
+  snapshot_id: string;
+}
