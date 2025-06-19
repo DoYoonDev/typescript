@@ -4,6 +4,7 @@ import NewTracks from './components/NewTracks';
 import { Box, styled } from '@mui/material';
 import OldTracks from './components/OldTracks';
 import HipAlbums from './components/HipAlbums';
+import Artists from './components/Atist';
 
 
 const ScrollContainer = styled(Box)({
@@ -21,6 +22,7 @@ const HomePage = () => {
     <div>
       <ScrollContainer style={{ maxHeight: "100dvh", overflowY: "auto" }}>
         <NewReleases />
+        <Artists />
         <NewTracks />
         <OldTracks />
         <HipAlbums />
